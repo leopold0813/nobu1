@@ -44,3 +44,4 @@ def check_scene(driver, scene):
         return True
     else:
         return False
+def login(driver,username):
