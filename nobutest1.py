@@ -44,3 +44,9 @@ def check_scene(driver, scene):
         return True
     else:
         return False
+ef login(driver,username):
+    driver.get()
+    sleep(3)
+    yahoo_btn=driver.find_element_by_xpath("//section[@class='m-t-xl']/div[5]/a")
+    driver.get(yahoo_btn.get_attribute('href')) 
+    sleep(5)
