@@ -517,7 +517,21 @@ class nya(object):
                     self.check_kaseki()
                     btns=driver.find_elements_by_xpath("//a[contains(@href,'entry_btl')]")
                     if (len(btns) <= 0):
-                        step = 0
+                        btn2s=driver.find_elements_by_xpath("//a[contains(@href,'warId')]")
+                        if (len(btn2s) <= 0):
+                            step = 0
+                        else:
+                            driver.get(btn2s[0].get_attribute('href'))
+                            self.__wait(2)
+                            try:
+                                for i in range(3):
+                                    btn=driver.find_element_by_id("sp-header-middle-btn")
+                                    TouchActions(driver).tap(btn).perform()
+                                    self.__wait(3)
+                                else:
+                                    step=2
+                            except:
+                                pass                            
                     elif (len(btns) == 1):
                         driver.get(btns[0].get_attribute('href'))
                         self.__wait(2)
