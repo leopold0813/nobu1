@@ -187,6 +187,8 @@ class nya(object):
             if '算盤術' not in frame1.text:
                 bhave=False
             else:
+                info1=(frame1.text).split("\n")
+                abacus=abacus+int(info1[2])
                 bhave=True
             TouchActions(driver).tap(frame1).perform()
             self.__wait(2)
@@ -198,8 +200,8 @@ class nya(object):
             sleep(1)    
             a=driver.find_element_by_xpath("//*[contains(@class,'td-reserve-frame') and contains(@class,'703')]")
             if '算盤術' in a.text:
-                info=(a.text).split("\n")
-                self.__write_log("%s: %s" % (info[0], info[1]))
+                info2=(a.text).split("\n")
+                abacus=abacus+int(info2[1])
                 if bhave:
                     btn = driver.find_element_by_id("joint_skill_select_return")
                     TouchActions(driver).tap(btn).perform()
@@ -218,8 +220,9 @@ class nya(object):
             if 'enable' in confirm.get_attribute("class"):
                 TouchActions(driver).tap(confirm).perform()
                 self.__wait(1)
-        except Exception as e:
-            self.__write_log(e)
+        except:
+            pass        
+        self.__write_log("算盤術: %d" % abacus)
         driver.get(home_url)
         self.__wait(2)
     def __login_process(self):
