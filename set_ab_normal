@@ -1,0 +1,20 @@
+def __set_abacus(self):        
+        self.setspell=False
+        driver=self.driver
+        driver.get(deck_url)
+        self.__wait(2)
+        #切换到奥义标签
+        try:
+            for i in range(3):
+                tap3=driver.find_element_by_xpath("//*[contains(@class,'tabindex3') and contains(@class,'hensei_tab_ng')]")
+                if not tap3.is_displayed():
+                    break
+                TouchActions(driver).tap(tap3).perform()
+                self.__wait(1)
+        except:
+            driver.get(home_url)
+            self.__wait(2)
+            return
+        #一括補充
+        driver.find_element_by_xpath("//input[@value='一括補充']").send_keys(Keys.RETURN)
+        sleep(1)
