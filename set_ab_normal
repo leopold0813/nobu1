@@ -18,3 +18,15 @@ def __set_abacus(self):
         #一括補充
         driver.find_element_by_xpath("//input[@value='一括補充']").send_keys(Keys.RETURN)
         sleep(1)
+        #持有奥义
+        abacus=0
+        abacus_bag=0
+        frames=driver.find_elements_by_class_name("td-select-frame")
+        for i in range(len(frames)):
+            if '算盤術' in frames[i].text:
+                info=(frames[i].text).split("\n")
+                abacus=abacus+int(info[2])
+        self.__wait(2)
+        index=4        
+        if abacus < 50:
+            index = abacus//10
