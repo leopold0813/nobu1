@@ -1,0 +1,14 @@
+for i in range(index,5):
+            bhave = True
+            if i == 0 and abacus == 0:
+                bhave = False
+            else:
+                bhave = False if i > index else True
+            TouchActions(driver).tap(frames[i]).perform()
+            self.__wait(2)
+            sortset=['td-sort-element','td-sort-level','td-sort-system']
+            inputset=['5','4','3']
+            for j in range(3):
+                select=driver.find_element_by_xpath("//select[@id='%s']" % sortset[j])
+                Select(select).select_by_value(inputset[j])
+                sleep(1)
