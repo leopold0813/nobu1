@@ -12,3 +12,19 @@ for i in range(index,5):
                 select=driver.find_element_by_xpath("//select[@id='%s']" % sortset[j])
                 Select(select).select_by_value(inputset[j])
                 sleep(1)
+            try:
+                a=driver.find_element_by_xpath("//*[contains(@class,'td-reserve-frame') and contains(@class,'703')]")
+                if '算盤術' in a.text:
+                    if abacus_bag == 0:
+                        info2=(a.text).split("\n")
+                        abacus_bag=int(info2[1])
+                    if bhave:
+                        btn = driver.find_element_by_id("joint_skill_select_return")
+                        TouchActions(driver).tap(btn).perform()
+                        self.__wait(1)
+                    else:
+                        TouchActions(driver).tap(a).perform()
+                        sleep(1)
+                        btn = driver.find_element_by_id("joint_skill_select")
+                        TouchActions(driver).tap(btn).perform()
+                    self.__wait(1)
