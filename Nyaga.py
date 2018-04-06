@@ -27,16 +27,15 @@ s-a-b a,b升星
 fa-a-b a,b刷算盘
 '''
 debug=0
+total_np=0
 class nya(object):
     lock=threading.Lock()
     def __init__(self, task):
         mobile_emulation = {"deviceName":"iPhone 6"}
         options = webdriver.ChromeOptions()
         options.add_experimental_option('mobileEmulation', mobile_emulation)
-##        prefs = {"profile.managed_default_content_settings.images":2}
-##        options.add_experimental_option("prefs",prefs)
+        options.add_argument("--window-size=396,840");
         self.driver = webdriver.Chrome(chrome_options=options)
-        self.driver.set_window_size(396,840)
         self.acc=task[0]
         self.pw=task[1]
         self.quest=task[2]
@@ -176,6 +175,7 @@ class nya(object):
         driver=self.driver
         driver.get(deck_url)
         self.__wait(2)
+        #切换到奥义标签
         try:
             for i in range(3):
                 tap3=driver.find_element_by_xpath("//*[contains(@class,'tabindex3') and contains(@class,'hensei_tab_ng')]")
@@ -183,48 +183,100 @@ class nya(object):
                     break
                 TouchActions(driver).tap(tap3).perform()
                 self.__wait(1)
-            frame1=driver.find_element_by_id('td-select-frame1')
-            if '算盤術' not in frame1.text:
-                bhave=False
+        except:
+            driver.get(home_url)
+            self.__wait(2)
+            return
+        #一括補充
+        driver.find_element_by_xpath("//input[@value='一括補充']").send_keys(Keys.RETURN)
+        sleep(1)
+        #持有奥义
+        abacus=0
+        abacus_bag=0
+        frames=driver.find_elements_by_class_name("td-select-frame")
+        for i in range(len(frames)):
+            if '算盤術' in frames[i].text:
+                info=(frames[i].text).split("\n")
+                abacus=abacus+int(info[2])
+        self.__wait(2)
+        index=4        
+        if abacus < 50:
+            index = abacus//10
+        for i in range(index,5):
+            bhave = True
+            if i == 0 and abacus == 0:
+                bhave = False
             else:
-                info1=(frame1.text).split("\n")
-                abacus=abacus+int(info1[2])
-                bhave=True
-            TouchActions(driver).tap(frame1).perform()
+                bhave = False if i > index else True
+            TouchActions(driver).tap(frames[i]).perform()
             self.__wait(2)
             sortset=['td-sort-element','td-sort-level','td-sort-system']
             inputset=['5','4','3']
-            for i in range(3):
-                select=driver.find_element_by_xpath("//select[@id='%s']" % sortset[i])
-                Select(select).select_by_value(inputset[i])
-            sleep(1)    
-            a=driver.find_element_by_xpath("//*[contains(@class,'td-reserve-frame') and contains(@class,'703')]")
-            if '算盤術' in a.text:
-                info2=(a.text).split("\n")
-                abacus=abacus+int(info2[1])
-                if bhave:
-                    btn = driver.find_element_by_id("joint_skill_select_return")
-                    TouchActions(driver).tap(btn).perform()
+            for j in range(3):
+                select=driver.find_element_by_xpath("//select[@id='%s']" % sortset[j])
+                Select(select).select_by_value(inputset[j])
+                sleep(1)
+            try:
+                a=driver.find_element_by_xpath("//*[contains(@class,'td-reserve-frame') and contains(@class,'703')]")
+                if '算盤術' in a.text:
+                    if abacus_bag == 0:
+                        info2=(a.text).split("\n")
+                        abacus_bag=int(info2[1])
+                    if bhave:
+                        btn = driver.find_element_by_id("joint_skill_select_return")
+                        TouchActions(driver).tap(btn).perform()
+                        self.__wait(1)
+                    else:
+                        TouchActions(driver).tap(a).perform()
+                        sleep(1)
+                        btn = driver.find_element_by_id("joint_skill_select")
+                        TouchActions(driver).tap(btn).perform()
                     self.__wait(1)
-                else:
-                    TouchActions(driver).tap(a).perform()
-                    sleep(1)
-                    btn = driver.find_element_by_id("joint_skill_select")
-                    TouchActions(driver).tap(btn).perform()
-                    self.__wait(1)
-            else:
-                self.__write_log("abacus: 0")            
-            driver.find_element_by_xpath("//input[@value='一括補充']").send_keys(Keys.RETURN)
-            sleep(1)
-            confirm=driver.find_element_by_class_name("confirm-button")
-            if 'enable' in confirm.get_attribute("class"):
-                TouchActions(driver).tap(confirm).perform()
+            except:
+                btn = driver.find_element_by_id("joint_skill_select_return")
+                TouchActions(driver).tap(btn).perform()
                 self.__wait(1)
-        except:
-            pass        
-        self.__write_log("算盤術: %d" % abacus)
+                break
+        confirm=driver.find_element_by_class_name("confirm-button")
+        if 'enable' in confirm.get_attribute("class"):
+            TouchActions(driver).tap(confirm).perform()
+            self.__wait(3)
+        self.__write_log("算盤術: %d" % (abacus+abacus_bag))
         driver.get(home_url)
         self.__wait(2)
+    def __set_abacus_battle(self):
+        driver=self.driver
+        driver.get(deck_url)
+        self.__wait(2)
+        #切换到奥义标签
+        try:
+            for i in range(3):
+                tap3=driver.find_element_by_xpath("//*[contains(@class,'tabindex3') and contains(@class,'hensei_tab_ng')]")
+                if not tap3.is_displayed():
+                    break
+                TouchActions(driver).tap(tap3).perform()
+                self.__wait(1)
+        except:
+            driver.get(home_url)
+            self.__wait(2)
+            return
+        #一括補充
+        driver.find_element_by_xpath("//input[@value='一括補充']").send_keys(Keys.RETURN)
+        sleep(1)
+        #持有奥义
+        abacus=0
+        frames=driver.find_elements_by_class_name("td-select-frame")
+        for i in range(len(frames)):
+            if '算盤術' in frames[i].text:
+                info=(frames[i].text).split("\n")
+                abacus=abacus+int(info[2])
+        confirm=driver.find_element_by_class_name("confirm-button")
+        if 'enable' in confirm.get_attribute("class"):
+            TouchActions(driver).tap(confirm).perform()
+            self.__wait(3)
+        self.__write_log("算盤術: %d" % (abacus))
+        driver.get(home_url)
+        self.__wait(2)    
     def __login_process(self):
         driver=self.driver
         driver.get(game_url)
@@ -299,6 +351,16 @@ class nya(object):
         driver=self.driver
         step=0
         hour=0
+        try:
+            nptext=driver.find_element_by_id("lottery_point")
+            np=int(nptext.text)            
+            global total_np
+            self.lock.acquire()
+            total_np = total_np+np
+            self.lock.release()
+            self.__write_log("NP:%d, TOTAL:%d" %(np, total_np))
+        except Exception as err:
+            self.__write_log(err)
         while True:
             if not self.__check_title():
                 driver.get(home_url)
@@ -487,6 +549,12 @@ class nya(object):
             if not self.__check_title():
                 driver.refresh()
                 self.__wait(1)
+            timenow=time.localtime()
+            if hour == 22 and timenow.tm_hour == 23:
+                self.login=True
+                return
+            else:
+                hour = timenow.tm_hour
             if step==0:
                 if not self.__check_scene('の里'):
                     if not self.__check_notice():
@@ -507,7 +575,7 @@ class nya(object):
                         else:
                             self.__wait(1)
                             if road ==0:
-                                self.__set_abacus()
+                                self.__set_abacus_battle()
                             step = 1
                     except:
                         driver.refresh()
@@ -522,7 +590,7 @@ class nya(object):
                     if (len(btns) <= 0):
                         btn2s=driver.find_elements_by_xpath("//a[contains(@href,'warId')]")
                         if (len(btn2s) <= 0):
-                            step = 0
+                            step=0
                         else:
                             driver.get(btn2s[0].get_attribute('href'))
                             self.__wait(2)
@@ -534,7 +602,7 @@ class nya(object):
                                 else:
                                     step=2
                             except:
-                                pass                            
+                                step=0
                     elif (len(btns) == 1):
                         driver.get(btns[0].get_attribute('href'))
                         self.__wait(2)
@@ -546,7 +614,7 @@ class nya(object):
                             else:
                                 step=2
                         except:
-                            pass
+                            step=0
                     else:
                         road_tmp=1
                         if road==0:
@@ -559,7 +627,7 @@ class nya(object):
                             for i in range(3):
                                 btn=driver.find_element_by_id("sp-header-middle-btn")
                                 TouchActions(driver).tap(btn).perform()
-                                self.__wait(2)
+                                self.__wait(3)
                             else:
                                 step=2
                         except:
@@ -573,8 +641,9 @@ class nya(object):
                         self.__wait(2)
                 else:
                     food=driver.find_element_by_xpath("//span[@id='element_food']")
-                    if (int(food.text)) < 620:
+                    if (int(food.text)) < 1000:
                         self.__write_log("low food logout")
+                        self.lowfood=True
                         return
                     else:
                         try:
@@ -692,9 +761,13 @@ class nya(object):
         if debug == 0:
             while True:
                 if quest[0] == 'b':
+                    if self.login:
+                        sleep(20)
+                        self.__login_process()
+                    elif self.lowfood:
+                        self.driver.close()
+                        return
                     self.battle(int(quest[1]))
-                    self.driver.close()
-                    return
                 elif quest[0] == 's':
                     self.star_up(int(quest[1]),int(quest[2]))
                 elif quest[0] == 'fa':
@@ -730,6 +803,6 @@ if __name__ == '__main__':
         for t in ts:
             t.join()
     else:
-        task=['boxpigstar0813','x','t']
+        task=['ryuzaki0813','x','t']
         nya1=nya(task)
         nya1.task()
