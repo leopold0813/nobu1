@@ -77,8 +77,13 @@ class nya(object):
         else:
             try:
                 if self.__check_scene("報告") or self.__check_scene("お知らせ"):
-                    btn=driver.find_element_by_id("sp-header-middle-btn")
-                    TouchActions(driver).tap(btn).perform()
+                    try:
+                        a=driver.find_element_by_id("sp_sc_5")
+                        driver.get(a.get_attribute('href'))
+                        self.__wait(1)
+                    except:
+                        btn=driver.find_element_by_id("sp-header-middle-btn")
+                        TouchActions(driver).tap(btn).perform()
                     return True
                 else:                
                     return False
@@ -89,7 +94,8 @@ class nya(object):
         if self.__check_scene("名将探索"):
             try:
                 a=driver.find_element_by_xpath("//*[contains(text(),'いいえ')]/..")
-                TouchActions(driver).tap(a).perform()
+                #TouchActions(driver).tap(a).perform()
+                driver.get(a.get_attribute('href'))
                 self.__wait(1)
             except:
                 pass
@@ -289,7 +295,8 @@ class nya(object):
         self.__wait(3)
         try:
             login_comfirm=driver.find_element_by_id("sp_sc_5")
-            TouchActions(driver).tap(login_comfirm).perform()
+            #TouchActions(driver).tap(login_comfirm).perform()
+            driver.get(login_comfirm.get_attribute('href'))
             self.__wait(2)
         except:
             pass
@@ -360,18 +367,19 @@ class nya(object):
     def find_abacus(self,a,b):
         driver=self.driver
         step=0
-        hour=0
         try:
             if self.lowfood:
                 self.lowfood = False
         except Exception as err:
             self.__write_log(err)
+        self.__goto(home_url)
+        self.__wait(1)
         while True:
             if step==0:
                 if self.__check_login_button():
                     self.__login_process()
                     sleep(3)
-                if not self.__check_scene('の里'):
+                elif not self.__check_scene('の里'):
                     if not self.__check_notice():
                         self.__goto(home_url)
                         self.__wait(1)
@@ -676,7 +684,10 @@ class nya(object):
                         self.__wait(1)
                         step=0
             elif step==2:
-                try:
+                try:                    
+                    sleep(1.5)
+                    driver.refresh()
+                    self.__wait(0)
                     if '登用可能な武将がいません' not in driver.page_source:  
                         buybtns=driver.find_elements_by_xpath("//input[@value='登用']")                    
                         if len(buybtns) > 0:
@@ -688,9 +699,8 @@ class nya(object):
                                     TouchActions(driver).tap(btn).perform()
                                     break
                             self.__wait(2)
+                            driver.get_screenshot_as_file('%s.png' % (time.strftime("%Y%m%d_%H%M%S", time.localtime())))
                             step=0
-                    driver.refresh()
-                    self.__wait(2)
                 except:
                     self.__goto(trade_url)
                     self.__wait(1)
@@ -771,20 +781,20 @@ class nya(object):
                 self.__wait(1)
                 self.star_up(int(quest[1]),int(quest[2]))
             elif quest[0] == 'fa':
-                self.__goto(home_url)
-                self.__wait(1)
-                if self.lowfood:
-                    sleep(3600)
-                    self.__goto(home_url)
+##                self.__goto(home_url)
+##                self.__wait(1)
+##                if self.lowfood:
+##                    sleep(3600)
+##                    self.__goto(home_url)
                 self.find_abacus(9,10)
             elif quest[0] == 'buy':
                 self.buy(int(quest[1]))
     def login_first(self):
         self.__start_driver(noimage=False)
         print("login %s" % self.acc)
-        sleep(10)
-        self.__goto(login_url)
-        sleep(20)
-        self.__goto(game_url)
-        self.__wait(2)
-        self.__stop_driver()
+        self.__login_by_password()
+        self.__wait(1)
+        self.__goto(home_url)
+    def test(self):
+        self.__start_driver(noimage=False)
+        self.__goto(home_url)
