@@ -15,6 +15,3 @@ if __name__ == '__main__':
             nya_obj=nya(data[0],data[1])
             nya_obj.login_first()
             sleep(5) 
-    #nya_obj=nya("boxpigstar0813",pw="cfalison")
-    #nya_obj.login_first()
-    #nya_obj.task("buy-1")
