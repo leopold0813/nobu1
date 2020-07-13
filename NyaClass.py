@@ -30,7 +30,7 @@ class nya(object):
         options.add_experimental_option('mobileEmulation', mobile_emulation)
         options.add_argument("--window-size=396,840")
         options.add_argument("--disable-web-security")
-        options.add_argument(r"user-data-dir=.\%s_data" % self.acc)
+        options.add_argument(r"user-data-dir=.\_cache\%s" % self.acc)
         prefs = {"profile.managed_default_content_settings.images":2 if self.noimage else 1}
         options.add_experimental_option("prefs",prefs)
         self.driver = webdriver.Chrome(chrome_options=options)
@@ -39,7 +39,7 @@ class nya(object):
         self.login=False
         self.setspell=True
         self.lowfood=False
-        sleep(10)
+        sleep(3)
     def __stop_driver(self):
         if self.driver is not None:
             self.driver.close()
@@ -69,8 +69,10 @@ class nya(object):
         driver=self.driver
         if 'flash' in driver.current_url:
             try:
-                a=driver.find_element_by_id("canvas")            
-                TouchActions(driver).tap(a).perform()
+                #a=driver.find_element_by_id("canvas")            
+                #TouchActions(driver).tap(a).perform()
+                url=driver.execute_script("return nextURL")
+                driver.get(url)
                 return True
             except:
                 return False
@@ -83,7 +85,9 @@ class nya(object):
                         self.__wait(1)
                     except:
                         btn=driver.find_element_by_id("sp-header-middle-btn")
-                        TouchActions(driver).tap(btn).perform()
+                        a=btn.find_element_by_tag_name("a")
+                        driver.execute_script("$(arguments[0]).click()",a)
+                        #TouchActions(driver).tap(btn).perform()
                     return True
                 else:                
                     return False
@@ -159,19 +163,20 @@ class nya(object):
             firetext=driver.find_element_by_xpath("//span[@id='element_fire']")
         except:
             return False
-        if int(firetext.text) <= 0:
+        if int(firetext.text) <= 100:
             return False
         try:
             a=driver.find_element_by_xpath("//area[contains(@title,'楽市楽座')]")
-            TouchActions(driver).tap(a).perform()
+            driver.execute_script("$(arguments[0]).click()",a)
             sleep(1)
             a=driver.find_element_by_xpath("//img[contains(@src,'btn_trade_all')]/..")
-            TouchActions(driver).tap(a).perform()
+            driver.execute_script("$(arguments[0]).click()",a)
             sleep(1)
             btns=driver.find_elements_by_id("neko-alert-dynamic-ok-button")
             for btn in btns:
                 if btn.is_displayed():
-                    TouchActions(driver).tap(btn).perform()
+                    img=btns[1].find_element_by_tag_name('img')
+                    driver.execute_script("$(arguments[0]).click()",img)
                     break
             self.__wait(2)
             driver.refresh()
@@ -179,7 +184,7 @@ class nya(object):
         except:
            return False
         return True
-    def __set_abacus(self):        
+    def set_abacus(self):        
         self.setspell=False
         driver=self.driver
         self.__goto(deck_url)
@@ -190,7 +195,8 @@ class nya(object):
                 tap3=driver.find_element_by_xpath("//*[contains(@class,'tabindex3') and contains(@class,'hensei_tab_ng')]")
                 if not tap3.is_displayed():
                     break
-                TouchActions(driver).tap(tap3).perform()
+                #TouchActions(driver).tap(tap3).perform()
+                driver.execute_script("$(arguments[0]).click()",tap3)
                 self.__wait(1)
         except:
             self.__goto(home_url)
@@ -217,7 +223,8 @@ class nya(object):
                 bhave = False
             else:
                 bhave = False if i > index else True
-            TouchActions(driver).tap(frames[i]).perform()
+            #TouchActions(driver).tap(frames[i]).perform()
+            driver.execute_script("$(arguments[0]).click()",frames[i])
             self.__wait(2)
             sortset=['td-sort-element','td-sort-level','td-sort-system']
             inputset=['5','4','3']
@@ -233,22 +240,27 @@ class nya(object):
                         abacus_bag=int(info2[1])
                     if bhave:
                         btn = driver.find_element_by_id("joint_skill_select_return")
-                        TouchActions(driver).tap(btn).perform()
+                        #TouchActions(driver).tap(btn).perform()
+                        driver.execute_script("$(arguments[0]).click()",btn)
                         self.__wait(1)
                     else:
-                        TouchActions(driver).tap(a).perform()
+                        #TouchActions(driver).tap(a).perform()
+                        driver.execute_script("$(arguments[0]).click()",a)
                         sleep(1)
                         btn = driver.find_element_by_id("joint_skill_select")
-                        TouchActions(driver).tap(btn).perform()
+                        driver.execute_script("$(arguments[0]).click()",btn)
+                        #TouchActions(driver).tap(btn).perform()
                     self.__wait(1)
             except:
                 btn = driver.find_element_by_id("joint_skill_select_return")
-                TouchActions(driver).tap(btn).perform()
+                #TouchActions(driver).tap(btn).perform()
+                driver.execute_script("$(arguments[0]).click()",btn)
                 self.__wait(1)
                 break
         confirm=driver.find_element_by_class_name("confirm-button")
         if 'enable' in confirm.get_attribute("class"):
-            TouchActions(driver).tap(confirm).perform()
+            #TouchActions(driver).tap(confirm).perform()
+            driver.execute_script("$(arguments[0]).click()",confirm)
             self.__wait(3)
         self.__write_log("算盤術: %d" % (abacus+abacus_bag))
         self.__goto(home_url)
@@ -263,7 +275,8 @@ class nya(object):
                 tap3=driver.find_element_by_xpath("//*[contains(@class,'tabindex3') and contains(@class,'hensei_tab_ng')]")
                 if not tap3.is_displayed():
                     break
-                TouchActions(driver).tap(tap3).perform()
+                #TouchActions(driver).tap(tap3).perform()
+                driver.execute_script("$(arguments[0]).click()",tap3)
                 self.__wait(1)
         except:
             self.__goto(home_url)
@@ -281,7 +294,8 @@ class nya(object):
                 abacus=abacus+int(info[2])
         confirm=driver.find_element_by_class_name("confirm-button")
         if 'enable' in confirm.get_attribute("class"):
-            TouchActions(driver).tap(confirm).perform()
+            #TouchActions(driver).tap(confirm).perform()
+            driver.execute_script("$(arguments[0]).click()",confirm)
             self.__wait(3)
         self.__write_log("算盤術: %d" % (abacus))
         self.__goto(home_url)
@@ -291,7 +305,8 @@ class nya(object):
         self.__goto(game_url)
         self.__wait(2)
         start_btn=driver.find_element_by_id("sp_sc_5")
-        TouchActions(driver).tap(start_btn).perform()
+        #TouchActions(driver).tap(start_btn).perform()
+        driver.get(start_btn.get_attribute('href'))
         self.__wait(3)
         try:
             login_comfirm=driver.find_element_by_id("sp_sc_5")
@@ -445,7 +460,7 @@ class nya(object):
                 else:
                     try:
                         food=driver.find_element_by_xpath("//span[@id='element_food']")
-                        if (int(food.text)) < 700:
+                        if (int(food.text)) < 240:
                             self.__write_log("low food logout")
                             break
                     except:
@@ -469,38 +484,40 @@ class nya(object):
                 else:
                     step=2
             elif step==2:
-                if self.__get_stay_town() != a and self.__get_stay_town() != b:
-                    self.__move_to_town(a)
-                    self.__wait(2)
-                    step=0
-                else:
-                    enemys=driver.find_elements_by_class_name('enemy_container')
-                    if len(enemys)==0:
-                        step=3
+#                if self.__get_stay_town() != a and self.__get_stay_town() != b:
+##                    self.__move_to_town(a)
+ #                   self.__wait(2)
+ #                   step=0
+ #               else:
+                enemys=driver.find_elements_by_class_name('enemy_container')
+                if len(enemys)==0:
+                    step=3
 #                    elif len(enemys[0].find_elements_by_xpath(".//img[contains(@src,'difficulty_mark.png')]")) == 7:
 #                        step=3
-                    else:
-                        if self.__kill_enemy(0):
-                            step=0
-                        else:
-                            step=0
-            elif step==3:
-                if self.__get_stay_town() != a:
-                    self.__move_to_town(a)
                 else:
-                    self.__move_to_town(b)
-                self.__wait(2)
+                    if self.__kill_enemy(0):
+                        step=0
+                    else:
+                        step=0
+            elif step==3:
+                # if self.__get_stay_town() != a:
+                #     self.__move_to_town(a)
+                # else:
+                #     self.__move_to_town(b)
+                # self.__wait(2)
                 step=0
     def check_battle_move(self):
         driver=self.driver
         self.__goto(map_url)
         self.__wait(2)
+        self.__check_meishou()
         if not self.__check_scene('全国地図'):
             return False
         move=driver.find_elements_by_xpath("//div/img[contains(@class,'event_move')]")
         if len(move) < 2:
             return False
-        TouchActions(driver).tap(move[0]).perform()
+        #TouchActions(driver).tap(move[0]).perform()
+        driver.execute_script("$(arguments[0]).click()",move[0])
         sleep(1)
         driver.find_element_by_xpath("//input[@value='移動する' and @type='submit']").send_keys(Keys.RETURN)
         sleep(1)
@@ -519,11 +536,14 @@ class nya(object):
             if len(b)<2:
                 return
             else:
-                TouchActions(driver).tap(b[0]).perform()
+                #TouchActions(driver).tap(b[0]).perform()
+                driver.execute_script("$(arguments[0]).click()",b[0])
                 self.__wait(1)
                 for i in range(2):
                     btn=driver.find_element_by_id("sp-header-middle-btn")
-                    TouchActions(driver).tap(btn).perform()
+                    #TouchActions(driver).tap(btn).perform()
+                    a=btn.find_element_by_tag_name("a")
+                    driver.execute_script("$(arguments[0]).click()",a)
                     self.__wait(1)
                 sleep(2)
     def auto_select_road(self):
@@ -543,22 +563,29 @@ class nya(object):
         driver=self.driver
         step=0
         hour=0
-        self.check_battle_move()
+        fullpower=False
+        #self.check_battle_move()
         while True:
-            timenow=time.localtime()
-            if hour == 22 and timenow.tm_hour == 23:
-                self.login=True
-                return
-            else:
-                hour = timenow.tm_hour
             if step==0:
-                if not self.__check_scene('の里'):
+                if self.__check_login_button():
+                    self.__login_process()
+                    sleep(3)
+                elif not self.__check_scene('の里'):
                     if not self.__check_notice():
                         self.__goto(home_url)
                         self.__wait(2)
                     else:
                         self.__wait(2)
                 else:
+                    if road != 0:                    
+                        try:                            
+                            self.__change_food()               
+                            food=driver.find_element_by_xpath("//span[@id='element_food']")
+                            if fullpower == False and (int(food.text)) > 7000:
+                                self.__write_log("fullpower")
+                                fullpower=True
+                        except:
+                            pass
                     try:
                         command=driver.find_element_by_class_name('sp_village_command')
                         if '帰還' in command.text:
@@ -592,9 +619,16 @@ class nya(object):
                             self.__wait(2)
                             try:
                                 for i in range(3):
-                                    btn=driver.find_element_by_id("sp-header-middle-btn")
-                                    TouchActions(driver).tap(btn).perform()
-                                    self.__wait(3)
+                                    if i == 1 and fullpower :
+                                        fullpower = False
+                                        a=driver.find_element_by_id("sp_sc_3").submit()
+                                        driver.execute_script("$(arguments[0]).click()",a)
+                                        self.__wait(3)
+                                    else:
+                                        btn=driver.find_element_by_id("sp-header-middle-btn")
+                                        a=btn.find_element_by_tag_name("a")
+                                        driver.execute_script("$(arguments[0]).click()",a)
+                                        self.__wait(3)
                                 else:
                                     step=2
                             except:
@@ -604,9 +638,16 @@ class nya(object):
                         self.__wait(2)
                         try:
                             for i in range(3):
-                                btn=driver.find_element_by_id("sp-header-middle-btn")
-                                TouchActions(driver).tap(btn).perform()
-                                self.__wait(3)
+                                if i == 1 and fullpower :
+                                    fullpower = False
+                                    a=driver.find_element_by_id("sp_sc_3").submit()
+                                    driver.execute_script("$(arguments[0]).click()",a)
+                                    self.__wait(3)
+                                else:
+                                    btn=driver.find_element_by_id("sp-header-middle-btn")
+                                    a=btn.find_element_by_tag_name("a")
+                                    driver.execute_script("$(arguments[0]).click()",a)
+                                    self.__wait(3)
                             else:
                                 step=2
                         except:
@@ -621,9 +662,16 @@ class nya(object):
                         self.__wait(2)
                         try:
                             for i in range(3):
-                                btn=driver.find_element_by_id("sp-header-middle-btn")
-                                TouchActions(driver).tap(btn).perform()
-                                self.__wait(3)
+                                if i == 1 and fullpower :
+                                    fullpower = False
+                                    a=driver.find_element_by_id("sp_sc_3").submit()
+                                    driver.execute_script("$(arguments[0]).click()",a)
+                                    self.__wait(3)
+                                else:
+                                    btn=driver.find_element_by_id("sp-header-middle-btn")
+                                    a=btn.find_element_by_tag_name("a")
+                                    driver.execute_script("$(arguments[0]).click()",a)
+                                    self.__wait(3)
                             else:
                                 step=2
                         except:
@@ -636,30 +684,14 @@ class nya(object):
                     else:
                         self.__wait(2)
                 else:
+                    if road==0:
+                        self.__change_food()
                     food=driver.find_element_by_xpath("//span[@id='element_food']")
                     if (int(food.text)) < 1000:
                         self.__write_log("low food logout")
                         self.lowfood=True
                         return
-                    else:
-                        try:
-                            a=driver.find_element_by_xpath("//area[contains(@title,'楽市楽座')]")
-                            TouchActions(driver).tap(a).perform()
-                            sleep(1)
-                            a=driver.find_element_by_xpath("//img[contains(@src,'btn_trade_all')]/..")
-                            TouchActions(driver).tap(a).perform()
-                            sleep(1)
-                            btns=driver.find_elements_by_id("neko-alert-dynamic-ok-button")
-                            for btn in btns:
-                                if btn.is_displayed():
-                                    TouchActions(driver).tap(btn).perform()
-                                    break
-                            self.__wait(2)
-                            driver.refresh()
-                            self.__wait(2)
-                            step=0
-                        except:
-                           pass
+                    step=0
     def buy(self, page):
         driver=self.driver
         step=0
@@ -671,23 +703,13 @@ class nya(object):
                 else:
                     step=1
             elif step==1:
-                if self.noimage:
-                    step=2
-                else:
-                    try:
-                        btn=driver.find_element_by_xpath("//img[@class='search_set_img' and @id='%d']/.." % page)
-                        TouchActions(driver).tap(btn).perform()
-                        self.__wait(2)
-                        step=2
-                    except:
-                        driver.refresh()
-                        self.__wait(1)
-                        step=0
-            elif step==2:
                 try:                    
-                    sleep(1.5)
+                    sleep(22)
                     driver.refresh()
                     self.__wait(0)
+                    if '利用できません' in driver.page_source:
+                        self.__write_log("buy stop")
+                        return
                     if '登用可能な武将がいません' not in driver.page_source:  
                         buybtns=driver.find_elements_by_xpath("//input[@value='登用']")                    
                         if len(buybtns) > 0:
@@ -696,10 +718,12 @@ class nya(object):
                             btns=driver.find_elements_by_id("neko-alert-dynamic-ok-button")
                             for btn in btns:
                                 if btn.is_displayed():
-                                    TouchActions(driver).tap(btn).perform()
+                                    img=btn.find_element_by_tag_name("img")
+                                    #TouchActions(driver).tap(btn).perform()
+                                    driver.execute_script("$(arguments[0]).click()",img)
                                     break
                             self.__wait(2)
-                            driver.get_screenshot_as_file('%s.png' % (time.strftime("%Y%m%d_%H%M%S", time.localtime())))
+                            driver.get_screenshot_as_file('%s_%s.png' % (self.acc,time.strftime("%Y%m%d_%H%M%S", time.localtime())))
                             step=0
                 except:
                     self.__goto(trade_url)
@@ -710,6 +734,7 @@ class nya(object):
         step=0
         t=0
         while t<times:
+            #self.__write_log("step %d" % step)
             if step==0:
                 if not self.__check_scene('の里'):
                     if not self.__check_notice():
@@ -733,7 +758,7 @@ class nya(object):
             elif step==1:
                 try:
                     a=driver.find_element_by_xpath("//area[contains(@title,'里門')]")
-                    TouchActions(driver).tap(a).perform()
+                    self.__goto(a.get_attribute('href'))
                     self.__wait(2)
                     if self.__check_scene('里門'):
                         step=2
@@ -744,12 +769,41 @@ class nya(object):
             elif step==2:
                 for i in range(3):
                     btn=driver.find_element_by_id("sp-header-middle-btn")
-                    TouchActions(driver).tap(btn).perform()
+                    a=btn.find_element_by_tag_name("a")
+                    driver.execute_script("$(arguments[0]).click()",a)
+                    #TouchActions(driver).tap(btn).perform()
                     sleep(2)
                 t=t+1
                 self.__goto(home_url)
                 sleep(2)
                 step=0
+    def fukubiki(self):
+        driver=self.driver
+        if not self.__check_scene('の里'):
+            if not self.__check_notice():
+                self.__goto(home_url)
+                self.__wait(2)
+            else:
+                self.__wait(2)
+        if self.__check_login_button():
+            self.__login_process()
+            sleep(3)
+        t = 0
+        while t < 3:
+            self.__goto("http://sp.pf.mbga.jp/12004455?_isCnv=1&url=http%3A%2F%2F210.140.157.168%2Fmobile%2Fuser%2Fmobile_comeback_recommend_list.htm%3Fsort_key%3D0%26sort_order%3D0%26page%3D5")
+            self.__wait(2)
+            a=driver.find_element_by_xpath("//table[@class='ranking']/tbody/tr[2]")
+            a1=a.find_element_by_tag_name('a')
+            self.__goto(a1.get_attribute('href'))
+            self.__wait(2)
+            sendbtn=driver.find_element_by_xpath("//a/*[contains(text(),'送信する')]/..")
+            self.__goto(sendbtn.get_attribute('href'))
+            self.__wait(1)
+            driver.find_element_by_xpath("//input[@value='決定' and @type='submit']").send_keys(Keys.RETURN)
+            self.__wait(2)
+            t+=1
+        self.__stop_driver()
+        return
     def task(self,task):
         #self.__start_driver(noimage=False)
         #self.__write_log("login start")
@@ -797,4 +851,8 @@ class nya(object):
         self.__goto(home_url)
     def test(self):
         self.__start_driver(noimage=False)
+        self.__goto(home_url)
+    def logintask(self):
+        self.__start_driver(noimage=False)
+        self.__login_process()
         self.__goto(home_url)
